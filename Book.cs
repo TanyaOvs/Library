@@ -20,34 +20,34 @@ namespace Library
         public string Author
         {
             get { return author; }
-            set { ValidateAuthor(value); author = value; }
+            set { ValidateStringField(value, "ФИО автора"); author = value; }
         }
 
         public string Genre
         {
             get { return genre; }
-            set { ValidateGenre(value); genre = value; }
+            set { ValidateStringField(value, "Жанр"); genre = value; }
         }
 
         public double CollateralValue
         {
             get { return collateralValue; }
-            set { ValidateCollateralValue(value); collateralValue = value; }
+            set { ValidatePrice(value, "Залоговая стоимость"); collateralValue = value; }
         }
 
         public double RentalCost
         {
             get { return rentalCost; }
-            set { ValidateRentalCost(value); rentalCost = value; }
+            set { ValidatePrice(value, "Стоимость проката"); rentalCost = value; }
         }
 
-        public Book(string title, string author, string genre, double collateral_value, double rental_cost) 
+        public Book(string title, string author, string genre, double collateralValue, double rentalCost) 
         {
             Title = title;
             Author = author;
             Genre = genre;
-            CollateralValue = collateral_value;
-            RentalCost = rental_cost;
+            CollateralValue = collateralValue;
+            RentalCost = rentalCost;
         }
 
         private static void ValidateTitle(string title)
@@ -59,46 +59,24 @@ namespace Library
                 throw new ArgumentException("Название книги содержит запрещенные символы!");
         }
 
-        private static void ValidateAuthor(string author)
+        private static void ValidateStringField(string field, string fieldName)
         {
-            if (string.IsNullOrWhiteSpace(author))
-                throw new ArgumentException("ФИО автора не может быть пустым или состоять только из пробелов!");
+            if (string.IsNullOrWhiteSpace(field))
+                throw new ArgumentException($"{fieldName} не может быть пустым или состоять только из пробелов!");
 
-            if (!Regex.IsMatch(author, @"^[А-ЯЁ][а-яё]+(?:[\- ][А-ЯЁ]?[а-яё]+)*$"))
-                throw new ArgumentException("ФИО автора должно содержать только русские буквы, начинаться с заглавной буквы, и может содержать пробелы или тире!");
+            if (!Regex.IsMatch(field, @"^[А-ЯЁ][а-яё]+(?:[\- ][А-ЯЁ]?[а-яё]+)*$"))
+                throw new ArgumentException($"{fieldName} может содержать только русские буквы, начинаться с заглавной буквы, и может содержать пробелы или тире!");
         }
 
-        private static void ValidateGenre(string genre)
+        private static void ValidatePrice(double price, string fieldName)
         {
-            if (string.IsNullOrWhiteSpace(genre))
-                throw new ArgumentException("Жанр не может быть пустым или состоять только из пробелов!");
+            const double MaxPriceValue = 10000;
 
-            if (!Regex.IsMatch(genre, @"^[А-ЯЁ][а-яё]+(?:[\- ][А-ЯЁ]?[а-яё]+)*$"))
-                throw new ArgumentException("Жанр должен содержать только русские буквы, начинаться с заглавной буквы, и может содержать пробелы или тире!");
-        }
+            if (price < 0 || price == 0)
+                throw new ArgumentException($"{fieldName} не может быть отрицательной или нулевой!");
 
-        private static void ValidateCollateralValue(double сollateralValue)
-        {
-            if (сollateralValue < 0)
-                throw new ArgumentException("Залоговая стоимость не может быть отрицательной!");
-
-            if (сollateralValue == 0)
-                throw new ArgumentException("Залоговая стоимость не может быть нулевой!");
-
-            if (сollateralValue > 10000)
-                throw new ArgumentException("Залоговая стоимость слишком высока!");
-        }
-
-        private static void ValidateRentalCost(double rentallValue)
-        {
-            if (rentallValue < 0)
-                throw new ArgumentException("Стоимость проката не может быть отрицательной!");
-
-            if (rentallValue == 0)
-                throw new ArgumentException("Стоимость проката не может быть нулевой!");
-
-            if (rentallValue > 10000)
-                throw new ArgumentException("Стоимость проката слишком высока!");
+            if (price > MaxPriceValue)
+                throw new ArgumentException($"{fieldName} не может превышать {MaxPriceValue}!");
         }
     }
 }
