@@ -8,7 +8,7 @@ namespace Library
 {
     public class Book
     {
-        private int book_id;
+        private int bookID;
         private string isbn;
         private string title;
         private string author;
@@ -16,10 +16,10 @@ namespace Library
         private double collateralValue;
         private double rentalCost;
 
-        public int Book_ID
+        public int BookID
         {
-            get { return book_id; }
-            set { ValidateBookID(value);book_id = value; }
+            get { return bookID; }
+            set { ValidateBookID(value);bookID = value; }
         }
 
         public string ISBN
@@ -58,9 +58,9 @@ namespace Library
             set { ValidatePrice(value, "Стоимость проката"); rentalCost = value; }
         }
 
-        public Book(int book_id, string isbn, string title, string author, string genre, double collateralValue, double rentalCost) 
+        public Book(int bookID, string isbn, string title, string author, string genre, double collateralValue, double rentalCost) 
         {
-            Book_ID = book_id;
+            BookID = bookID;
             ISBN = isbn;
             Title = title;
             Author = author;
@@ -75,7 +75,7 @@ namespace Library
             if (data_parts.Length != 7)
                 throw new ArgumentException("Строка должна содержать 7 полей, разделенных ';'");
 
-            Book_ID = int.Parse(data_parts[0]);
+            BookID = int.Parse(data_parts[0]);
             ISBN = data_parts[1];
             Title = data_parts[2];
             Author = data_parts[3];
@@ -107,7 +107,7 @@ namespace Library
                 using JsonDocument doc = JsonDocument.Parse(jsonString);
                 JsonElement root = doc.RootElement;
 
-                Book_ID = root.GetProperty("book_id").GetInt32();
+                BookID = root.GetProperty("book_id").GetInt32();
                 ISBN = root.GetProperty("isbn").GetString();
                 Title = root.GetProperty("title").GetString();
                 Author = root.GetProperty("author").GetString();
@@ -175,7 +175,7 @@ namespace Library
 
         public void PrintFullBook()
         {
-            Console.WriteLine($"ID: {Book_ID}\n" +
+            Console.WriteLine($"ID: {BookID}\n" +
                    $"ISBN: {ISBN}\n" +
                    $"Название: {Title}\n" +
                    $"Автор: {Author}\n" +
