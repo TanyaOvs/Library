@@ -84,7 +84,6 @@ namespace Library
             RentalCost = double.Parse(data_parts[6]);
         }
 
-
         public Book(string filePath, bool fromFile)
         {
             //string absolutePath = Path.GetFullPath(filePath);
@@ -125,7 +124,6 @@ namespace Library
                 throw new ArgumentException("Ошибка чтения файла: " + ex.Message);
             }
         }
-
 
         private static void ValidateBookID(int id)
         {
@@ -173,6 +171,30 @@ namespace Library
 
             if (price > MaxPriceValue)
                 throw new ArgumentException($"{fieldName} не может превышать {MaxPriceValue}!");
+        }
+
+        public void PrintFullBook()
+        {
+            Console.WriteLine($"ID: {Book_ID}\n" +
+                   $"ISBN: {ISBN}\n" +
+                   $"Название: {Title}\n" +
+                   $"Автор: {Author}\n" +
+                   $"Жанр: {Genre}\n" +
+                   $"Залоговая стоимость: {CollateralValue}\n" +
+                   $"Стоимость проката: {RentalCost}\n");
+        }
+
+        public void PrintShortBook()
+        {
+            Console.WriteLine($"'{Title}' - {Author}, {Genre}, ISBN: {ISBN}");
+        }
+
+        public static void CompareBooks(Book firstBook, Book secondBook) 
+        {
+            if (firstBook.ISBN == secondBook.ISBN)
+                Console.WriteLine("Книги одинаковы.");
+            else 
+                Console.WriteLine("Книги разные.");
         }
     }
 }
