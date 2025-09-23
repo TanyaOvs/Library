@@ -107,7 +107,7 @@ namespace Library
                 using JsonDocument doc = JsonDocument.Parse(jsonString);
                 JsonElement root = doc.RootElement;
 
-                BookID = root.GetProperty("book_id").GetInt32();
+                BookID = root.GetProperty("bookID").GetInt32();
                 ISBN = root.GetProperty("isbn").GetString();
                 Title = root.GetProperty("title").GetString();
                 Author = root.GetProperty("author").GetString();
@@ -198,3 +198,4 @@ namespace Library
         }
     }
 }
+
