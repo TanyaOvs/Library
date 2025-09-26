@@ -71,7 +71,7 @@ namespace Library
 
         public Book(string dataString)
         {
-            var data_parts = dataString.Split(';');
+            var data_parts = (dataString.Trim()).Split(';');
             if (data_parts.Length != 7)
                 throw new ArgumentException("Строка должна содержать 7 полей, разделенных ';'");
 
@@ -107,7 +107,7 @@ namespace Library
                 using JsonDocument doc = JsonDocument.Parse(jsonString);
                 JsonElement root = doc.RootElement;
 
-                BookID = root.GetProperty("bookID").GetInt32();
+                BookID = root.GetProperty("book_id").GetInt32();
                 ISBN = root.GetProperty("isbn").GetString();
                 Title = root.GetProperty("title").GetString();
                 Author = root.GetProperty("author").GetString();
@@ -173,7 +173,7 @@ namespace Library
                 throw new ArgumentException($"{fieldName} не может превышать {MaxPriceValue}!");
         }
 
-        public void PrintFullBook()
+        public virtual void PrintFullInfo()
         {
             Console.WriteLine($"ID: {BookID}\n" +
                    $"ISBN: {ISBN}\n" +
@@ -184,7 +184,7 @@ namespace Library
                    $"Стоимость проката: {RentalCost}\n");
         }
 
-        public void PrintShortBook()
+        public virtual void PrintShortInfo()
         {
             Console.WriteLine($"'{Title}' - {Author}, {Genre}, ISBN: {ISBN}");
         }
@@ -198,4 +198,3 @@ namespace Library
         }
     }
 }
-
