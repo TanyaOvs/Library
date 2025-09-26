@@ -3,73 +3,43 @@ using System.Text.RegularExpressions;
 
 namespace Library
 {
-    class BookPreview
+    class BookPreview : Book
     {
-        private int bookID;
-        private string isbn;
-        private double collateralValue;
-        private double rentalCost;
+        private string titleAndAuthor;
 
-        public int BookID
+        public string TitleAndAuthor
         {
-            get { return bookID; }
-            set { ValidateBookID(value); bookID = value; }
+            get { return titleAndAuthor; }
+            set { ValidateTitleAndAuthor(value); titleAndAuthor = value; }
         }
 
-        public string ISBN
+
+        public BookPreview(int bookID, string isbn, string title, string author, string genre, double collateralValue, double rentalCost)
+         : base(bookID, isbn, title, author, genre, collateralValue, rentalCost)
         {
-            get { return isbn; }
-            set { ValidateISBN(value); isbn = value; }
+            TitleAndAuthor = title + " - " + author;
         }
 
-        public double CollateralValue
+        private void ValidateTitleAndAuthor(string titleAndAuthor)
         {
-            get { return collateralValue; }
-            set { ValidatePrice(value, "Залоговая стоимость"); collateralValue = value; }
+            if (string.IsNullOrWhiteSpace(titleAndAuthor))
+                throw new ArgumentException("Значение для поля 'Название книги и автор' не может быть пустым!");
+
+            if (!Regex.IsMatch(titleAndAuthor, @"^[\d\w\s,:!?а-яА-ЯёЁ-]+[А-ЯЁ][а-яё]+(?:[\- ][А-ЯЁ]?[а-яё]+)*$"))
+                throw new ArgumentException("Значение для поля 'Название книги и автор' содержит запрещенные символы!");
         }
 
-        public double RentalCost
+        public override void PrintFullInfo()
         {
-            get { return rentalCost; }
-            set { ValidatePrice(value, "Стоимость проката"); rentalCost = value; }
+            Console.WriteLine($"ID: {BookID}\n" +
+                   $"ISBN: {ISBN}\n" +
+                   $"Залоговая стоимость: {CollateralValue}\n" +
+                   $"Стоимость проката: {RentalCost}");
         }
 
-        public BookPreview(int bookID, string isbn, double collateralValue, double rentalCost)
+        public override void PrintShortInfo()
         {
-            BookID = bookID;
-            ISBN = isbn;
-            CollateralValue = collateralValue;
-            RentalCost = rentalCost;
-        }
-        
-        private static void ValidateBookID(int id)
-        {
-            if (id <= 0)
-                throw new ArgumentException("ID книги должен быть положительным числом!");
-
-            if (id > 999999)
-                throw new ArgumentException("ID книги не может превышать 6 цифр!");
-        }
-
-        private static void ValidateISBN(string isbn)
-        {
-            if (string.IsNullOrWhiteSpace(isbn))
-                throw new ArgumentException("ISBN не может быть пустым!");
-
-            // Регулярное выражение для формата ISBN-13: (978|979)-5-12345-678-0
-            if (!Regex.IsMatch(isbn, @"^(978|979)-\d-\d{5}-\d{3}-\d$"))
-                throw new ArgumentException("ISBN должен быть в формате: '978-*-*****-***-*' или '979-*-*****-***-*'.");
-        }
-        
-        private static void ValidatePrice(double price, string fieldName)
-        {
-            const double MaxPriceValue = 10000;
-
-            if (price < 0 || price == 0)
-                throw new ArgumentException($"{fieldName} не может быть отрицательной или нулевой!");
-
-            if (price > MaxPriceValue)
-                throw new ArgumentException($"{fieldName} не может превышать {MaxPriceValue}!");
+            Console.WriteLine($"{TitleAndAuthor}");
         }
 
     }
