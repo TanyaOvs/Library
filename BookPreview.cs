@@ -1,45 +1,40 @@
 using System;
-using System.Text.RegularExpressions;
 
 namespace Library
 {
-    class BookPreview : Book
+    class BookPreview
     {
-        private string titleAndAuthor;
+        private readonly Book book;
+        public int BookID { get; }
+        public string TitleAndAuthor { get; private set; }
+        public string Genre { get; }
+        public double RentalCost { get; }
 
-        public string TitleAndAuthor
+        public BookPreview(Book book)
         {
-            get { return titleAndAuthor; }
-            set { ValidateTitleAndAuthor(value); titleAndAuthor = value; }
+            if (book == null)
+            {
+                throw new ArgumentNullException(nameof(book), "Объект Book не может быть путсым!");
+            }
+            this.book = book;
+            BookID = book.BookID;
+            TitleAndAuthor = $"{book.Title} - {book.Author}";
+            Genre = book.Genre;
+            RentalCost = book.RentalCost;
         }
 
 
-        public BookPreview(int bookID, string isbn, string title, string author, string genre, double collateralValue, double rentalCost)
-         : base(bookID, isbn, title, author, genre, collateralValue, rentalCost)
-        {
-            TitleAndAuthor = title + " - " + author;
-        }
-
-        private void ValidateTitleAndAuthor(string titleAndAuthor)
-        {
-            if (string.IsNullOrWhiteSpace(titleAndAuthor))
-                throw new ArgumentException("Значение для поля 'Название книги и автор' не может быть пустым!");
-
-            if (!Regex.IsMatch(titleAndAuthor, @"^[\d\w\s,:!?а-яА-ЯёЁ-]+[А-ЯЁ][а-яё]+(?:[\- ][А-ЯЁ]?[а-яё]+)*$"))
-                throw new ArgumentException("Значение для поля 'Название книги и автор' содержит запрещенные символы!");
-        }
-
-        public override void PrintFullInfo()
+        public void PrintFullInfo()
         {
             Console.WriteLine($"ID: {BookID}\n" +
-                   $"ISBN: {ISBN}\n" +
-                   $"Залоговая стоимость: {CollateralValue}\n" +
-                   $"Стоимость проката: {RentalCost}");
+                   $"Книга: {TitleAndAuthor}\n" +
+                   $"Жанр: {Genre}\n" +
+                   $"Стоимость проката: {RentalCost}\n");
         }
 
-        public override void PrintShortInfo()
+        public void PrintShortInfo()
         {
-            Console.WriteLine($"{TitleAndAuthor}");
+            Console.WriteLine($"{TitleAndAuthor}\n");
         }
 
     }
