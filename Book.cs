@@ -8,6 +8,7 @@ namespace Library
 {
     public class Book
     {
+        private static int globalBookID = 0;
         private int bookID;
         private string isbn;
         private string title;
@@ -19,7 +20,7 @@ namespace Library
         public int BookID
         {
             get { return bookID; }
-            set { ValidateBookID(value);bookID = value; }
+            set { bookID = value; }
         }
 
         public string ISBN
@@ -58,9 +59,9 @@ namespace Library
             set { ValidatePrice(value, "Стоимость проката"); rentalCost = value; }
         }
 
-        public Book(int bookID, string isbn, string title, string author, string genre, double collateralValue, double rentalCost) 
+        public Book(string isbn, string title, string author, string genre, double collateralValue, double rentalCost)
         {
-            BookID = bookID;
+            BookID = ++globalBookID;
             ISBN = isbn;
             Title = title;
             Author = author;
@@ -72,16 +73,15 @@ namespace Library
         public Book(string dataString)
         {
             var data_parts = (dataString.Trim()).Split(';');
-            if (data_parts.Length != 7)
-                throw new ArgumentException("Строка должна содержать 7 полей, разделенных ';'");
-
-            BookID = int.Parse(data_parts[0]);
-            ISBN = data_parts[1];
-            Title = data_parts[2];
-            Author = data_parts[3];
-            Genre = data_parts[4];
-            CollateralValue = double.Parse(data_parts[5]);
-            RentalCost = double.Parse(data_parts[6]);
+            if (data_parts.Length != 6)
+                throw new ArgumentException("Строка должна содержать 6 полей, разделенных ';'");
+            BookID = ++globalBookID;
+            ISBN = data_parts[0];
+            Title = data_parts[1];
+            Author = data_parts[2];
+            Genre = data_parts[3];
+            CollateralValue = double.Parse(data_parts[4]);
+            RentalCost = double.Parse(data_parts[5]);
         }
 
         public Book(string filePath, bool fromFile)
@@ -106,8 +106,7 @@ namespace Library
                 string jsonString = File.ReadAllText(filePath);
                 using JsonDocument doc = JsonDocument.Parse(jsonString);
                 JsonElement root = doc.RootElement;
-
-                BookID = root.GetProperty("book_id").GetInt32();
+                BookID = ++globalBookID;
                 ISBN = root.GetProperty("isbn").GetString();
                 Title = root.GetProperty("title").GetString();
                 Author = root.GetProperty("author").GetString();
@@ -123,15 +122,6 @@ namespace Library
             {
                 throw new ArgumentException("Ошибка чтения файла: " + ex.Message);
             }
-        }
-
-        private static void ValidateBookID(int id)
-        {
-            if (id <= 0)
-                throw new ArgumentException("ID книги должен быть положительным числом!");
-
-            if (id > 999999)
-                throw new ArgumentException("ID книги не может превышать 6 цифр!");
         }
 
         private static void ValidateISBN(string isbn)
@@ -173,7 +163,7 @@ namespace Library
                 throw new ArgumentException($"{fieldName} не может превышать {MaxPriceValue}!");
         }
 
-        public virtual void PrintFullInfo()
+        public void PrintFullInfo()
         {
             Console.WriteLine($"ID: {BookID}\n" +
                    $"ISBN: {ISBN}\n" +
@@ -184,16 +174,16 @@ namespace Library
                    $"Стоимость проката: {RentalCost}\n");
         }
 
-        public virtual void PrintShortInfo()
+        public void PrintShortInfo()
         {
-            Console.WriteLine($"'{Title}' - {Author}, {Genre}, ISBN: {ISBN}");
+            Console.WriteLine($"'{Title}' - {Author}, {Genre}, ISBN: {ISBN}\n");
         }
 
-        public static void CompareBooks(Book firstBook, Book secondBook) 
+        public static void CompareBooks(Book firstBook, Book secondBook)
         {
             if (firstBook.ISBN == secondBook.ISBN)
                 Console.WriteLine("Книги одинаковы.");
-            else 
+            else
                 Console.WriteLine("Книги разные.");
         }
     }
