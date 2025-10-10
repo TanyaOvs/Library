@@ -1,40 +1,42 @@
-using System;
-
 namespace Library
 {
-    class BookPreview
+    class BookPreview : Book
     {
-        private readonly Book book;
-        public int BookID { get; }
-        public string TitleAndAuthor { get; private set; }
-        public string Genre { get; }
-        public double RentalCost { get; }
-
-        public BookPreview(Book book)
+        private double collateralValue;
+        private double rentalCost;
+        public double CollateralValue
         {
-            if (book == null)
-            {
-                throw new ArgumentNullException(nameof(book), "Объект Book не может быть путсым!");
-            }
-            this.book = book;
-            BookID = book.BookID;
-            TitleAndAuthor = $"{book.Title} - {book.Author}";
-            Genre = book.Genre;
-            RentalCost = book.RentalCost;
+            get { return collateralValue; }
+            set { ValidatePrice(value, "Залоговая стоимость"); collateralValue = value; }
         }
 
-
-        public void PrintFullInfo()
+        public double RentalCost
         {
-            Console.WriteLine($"ID: {BookID}\n" +
-                   $"Книга: {TitleAndAuthor}\n" +
-                   $"Жанр: {Genre}\n" +
-                   $"Стоимость проката: {RentalCost}\n");
+            get { return rentalCost; }
+            set { ValidatePrice(value, "Стоимость проката"); rentalCost = value; }
         }
 
-        public void PrintShortInfo()
+        public BookPreview(string isbn, string title, string author, string genre, double collateralValue, double rentalCost) : base(isbn, title, author, genre)
         {
-            Console.WriteLine($"{TitleAndAuthor}\n");
+            CollateralValue = collateralValue;
+            RentalCost = rentalCost;
+        }
+
+        private static void ValidatePrice(double price, string fieldName)
+        {
+            const double MaxPriceValue = 10000;
+
+            if (price < 0 || price == 0)
+                throw new ArgumentException($"{fieldName} не может быть отрицательной или нулевой!");
+
+            if (price > MaxPriceValue)
+                throw new ArgumentException($"{fieldName} не может превышать {MaxPriceValue}!");
+        }
+
+        public override void PrintShortInfo()
+        {
+            Console.WriteLine($"Залоговая стоимость: {CollateralValue}\n" +
+                              $"Стоимость проката: {RentalCost}\n");
         }
 
     }
