@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -14,9 +12,7 @@ namespace Library
         private string title;
         private string author;
         private string genre;
-        private double collateralValue;
-        private double rentalCost;
-
+        
         public int BookID
         {
             get { return bookID; }
@@ -47,41 +43,25 @@ namespace Library
             set { ValidateStringField(value, "Жанр"); genre = value; }
         }
 
-        public double CollateralValue
-        {
-            get { return collateralValue; }
-            set { ValidatePrice(value, "Залоговая стоимость"); collateralValue = value; }
-        }
-
-        public double RentalCost
-        {
-            get { return rentalCost; }
-            set { ValidatePrice(value, "Стоимость проката"); rentalCost = value; }
-        }
-
-        public Book(string isbn, string title, string author, string genre, double collateralValue, double rentalCost)
+        public Book(string isbn, string title, string author, string genre)
         {
             BookID = ++globalBookID;
             ISBN = isbn;
             Title = title;
             Author = author;
             Genre = genre;
-            CollateralValue = collateralValue;
-            RentalCost = rentalCost;
         }
 
         public Book(string dataString)
         {
             var data_parts = (dataString.Trim()).Split(';');
-            if (data_parts.Length != 6)
-                throw new ArgumentException("Строка должна содержать 6 полей, разделенных ';'");
+            if (data_parts.Length != 4)
+                throw new ArgumentException("Строка должна содержать 4 поля, разделенных ';'");
             BookID = ++globalBookID;
             ISBN = data_parts[0];
             Title = data_parts[1];
             Author = data_parts[2];
             Genre = data_parts[3];
-            CollateralValue = double.Parse(data_parts[4]);
-            RentalCost = double.Parse(data_parts[5]);
         }
 
         public Book(string filePath, bool fromFile)
@@ -111,8 +91,6 @@ namespace Library
                 Title = root.GetProperty("title").GetString();
                 Author = root.GetProperty("author").GetString();
                 Genre = root.GetProperty("genre").GetString();
-                CollateralValue = root.GetProperty("collateralValue").GetDouble();
-                RentalCost = root.GetProperty("rentalCost").GetDouble();
             }
             catch (JsonException ex)
             {
@@ -152,29 +130,16 @@ namespace Library
                 throw new ArgumentException($"{fieldName} может содержать только русские буквы, начинаться с заглавной буквы, и может содержать пробелы или тире!");
         }
 
-        private static void ValidatePrice(double price, string fieldName)
-        {
-            const double MaxPriceValue = 10000;
-
-            if (price < 0 || price == 0)
-                throw new ArgumentException($"{fieldName} не может быть отрицательной или нулевой!");
-
-            if (price > MaxPriceValue)
-                throw new ArgumentException($"{fieldName} не может превышать {MaxPriceValue}!");
-        }
-
         public void PrintFullInfo()
         {
             Console.WriteLine($"ID: {BookID}\n" +
                    $"ISBN: {ISBN}\n" +
                    $"Название: {Title}\n" +
                    $"Автор: {Author}\n" +
-                   $"Жанр: {Genre}\n" +
-                   $"Залоговая стоимость: {CollateralValue}\n" +
-                   $"Стоимость проката: {RentalCost}\n");
+                   $"Жанр: {Genre}\n");
         }
 
-        public void PrintShortInfo()
+        public virtual void PrintShortInfo()
         {
             Console.WriteLine($"'{Title}' - {Author}, {Genre}, ISBN: {ISBN}\n");
         }
