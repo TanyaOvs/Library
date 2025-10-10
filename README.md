@@ -1,1 +1,1 @@
-![Хорошего дня!](https://meme-arsenal.com/create/meme/7578242)
+![Хорошего дня!](https://www.meme-arsenal.com/memes/bfe3be8d63550661e14aff40ac7ae73f.jpg)
