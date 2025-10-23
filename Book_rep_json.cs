@@ -50,5 +50,33 @@ namespace Library
                 throw new ArgumentException("Ошибка чтения файла: " + ex.Message);
             }
         }
+
+        public void WriteJson(List<Book> bookList)
+        {
+            if (bookList == null || bookList.Count == 0)
+                throw new ArgumentException("Список книг пуст или не инициализирован, нельзя записать данные в файл!");
+
+            string outputFile = Path.Combine(Directory.GetCurrentDirectory(), "written_books.json");
+
+            try
+            {
+                // Настройки для форматированного вывода
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true, // отступы в файле
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // кодировка для читабельного русского языка
+                };
+
+                string jsonString = JsonSerializer.Serialize(bookList, options);
+                File.WriteAllText(outputFile, jsonString);
+
+                Console.WriteLine($"{bookList.Count} книг(-и) успешно записаны в файл: {outputFile}");
+            }
+            catch (Exception ex)
+            {
+                throw new IOException("Ошибка при записи JSON-файла: " + ex.Message);
+            }
+        }
+
     }
 }
