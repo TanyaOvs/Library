@@ -233,5 +233,13 @@ namespace Library
             Console.WriteLine("Список книг успешно отсортирован по названию!");
             PrintBooksList(bookList);
         }
+        
+        public List<Book> AddBookInList(List<Book> bookList, Book book)
+        {
+            bookList.Add(book);
+            return bookList;
+        }
+
+        
     }
 }
