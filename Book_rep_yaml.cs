@@ -84,6 +84,20 @@ namespace Library
                 throw new IOException("Ошибка при записи YAML-файла: " + ex.Message);
             }
         }
+
+        public Book GetBookByID(List<Book> bookList, int bookID)
+        {
+            if (bookList == null || bookList.Count == 0)
+                throw new ArgumentException("Список книг пуст или не инициализирован.");
+        
+            // Ищем книгу с помощью метода LINQ, который возвращает первый элемент, удовлетворяющий условию с bookID
+            Book foundBook = bookList.FirstOrDefault(book => book.BookID == bookID);
+        
+            if (foundBook == null)
+                throw new ArgumentException($"Книга с ID={bookID} не найдена в списке.");
+        
+            return foundBook;
+        }
         
     }
 }
