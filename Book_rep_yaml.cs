@@ -51,5 +51,39 @@ namespace Library
                 throw new ArgumentException("Ошибка чтения файла: " + ex.Message);
             }
         }
+
+        public void WriteYaml(List<Book> bookList)
+        {
+            if (bookList == null || bookList.Count == 0)
+                throw new ArgumentException("Список книг пуст или не инициализирован, нельзя записать данные в файл!");
+        
+            string outputFile = Path.Combine(Directory.GetCurrentDirectory(), "written_books.yaml");
+            try
+            {
+                // Создаем сериализатор с читаемым форматированием и CamelCase для YAML
+                ISerializer serializer = new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+                
+                // Создаем вспомогательный список для сериализации
+                List<object> yamlObjects = new List<object>();
+                foreach (Book book in bookList)
+                {
+                    yamlObjects.Add(new
+                    {
+                        isbn = book.ISBN,
+                        title = book.Title,
+                        author = book.Author,
+                        genre = book.Genre
+                    });
+                }
+                string yamlString = serializer.Serialize(yamlObjects);
+                File.WriteAllText(outputFile, yamlString);
+                Console.WriteLine($"{bookList.Count} книг(-и) успешно записаны в файл: {outputFile}");
+            }
+            catch (Exception ex)
+            {
+                throw new IOException("Ошибка при записи YAML-файла: " + ex.Message);
+            }
+        }
+        
     }
 }
