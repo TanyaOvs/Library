@@ -230,6 +230,18 @@ namespace Library
             PrintBooksList(bookList);
         }
 
+        public List<Book> AddBookInList(List<Book> bookList, Book book)
+        {
+            foreach (Book bookElem in bookList)
+            {
+                if (Book.CompareBooks(book, bookElem))
+                {
+                    throw new ArgumentException($"Нельзя добавить книгу {book.Title}: книга с таким же ISBN уже находится в списке!");
+                }
+            }
+            bookList.Add(book);
+            return bookList;
+        }
         
     }
 }
