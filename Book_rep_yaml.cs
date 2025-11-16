@@ -264,6 +264,10 @@ namespace Library
             bookList.Remove(book);
             return bookList;
         }
-        
+
+        public int Get_Count(List<Book> bookList)
+        {
+            return bookList.Count;
+        }
     }
 }
