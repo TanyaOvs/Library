@@ -173,6 +173,63 @@ namespace Library
             List<BookPreview> result = k.Skip(skipCount).Take(pageSize).ToList();
             PrintBooksList(result);
         }
+
+        private bool IsDigitsOnly(string str)
+        {
+            foreach (char c in str)
+            {
+                if (!char.IsDigit(c))
+                    return false;
+            }
+            return !string.IsNullOrEmpty(str);
+        }
+        
+        public void SortBooksByTitle(List<Book> bookList)
+        {
+            if (bookList == null || bookList.Count == 0)
+            {
+                Console.WriteLine("Список пуст или не существует.");
+                return;
+            }
+        
+            for (int i = 0; i < bookList.Count - 1; i++)
+            {
+                for (int j = i + 1; j < bookList.Count; j++)
+                {
+                    Book book1 = bookList[i];
+                    Book book2 = bookList[j];
+        
+                    bool isDigits1 = IsDigitsOnly(book1.Title);
+                    bool isDigits2 = IsDigitsOnly(book2.Title);
+        
+                    // Если обе книги содержат только цифры в названии, то сортируем как числа
+                    if (isDigits1 && isDigits2)
+                    {
+                        long num1 = long.Parse(book1.Title);
+                        long num2 = long.Parse(book2.Title);
+        
+                        if (num1 > num2)
+                            (bookList[i], bookList[j]) = (bookList[j], bookList[i]);
+                    }
+        
+                    // Если название первой книги содержит только цифры, то она идет раньше в списке
+                    else if (isDigits1 && !isDigits2)
+                        (bookList[i], bookList[j]) = (bookList[j], bookList[i]);
+        
+                    // Если название второй книги содержит только цифры, то она идёт позже в списке
+                    else if (!isDigits1 && isDigits2)
+                        continue;
+        
+                    // Если названия обеих книг строковые, то выполняем обычную лексикографическую сортировку
+                    else if (string.Compare(book1.Title, book2.Title, StringComparison.OrdinalIgnoreCase) > 0)
+                        (bookList[i], bookList[j]) = (bookList[j], bookList[i]);
+                }
+            }
+        
+            Console.WriteLine("Список книг успешно отсортирован по названию!");
+            PrintBooksList(bookList);
+        }
+
         
     }
 }
