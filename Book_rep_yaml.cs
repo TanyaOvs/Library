@@ -242,6 +242,22 @@ namespace Library
             bookList.Add(book);
             return bookList;
         }
+
+        public List<Book> ChangeBookByID(List<Book> bookList, Book book, int bookID)
+        {
+            if (bookID < 0 || bookID >= bookList.Count)
+                throw new ArgumentException("ID выходит за пределы списка bookList!");
+        
+            foreach (Book bookElem in bookList)
+            { 
+                if(bookElem.BookID == bookID)
+                {
+                    bookList[bookList.IndexOf(bookElem)] = book;
+                    break;
+                }
+            }
+            return bookList;
+        }
         
     }
 }
