@@ -258,6 +258,12 @@ namespace Library
             }
             return bookList;
         }
+
+        public List<Book> DeleteBookInList(List<Book> bookList, Book book)
+        {
+            bookList.Remove(book);
+            return bookList;
+        }
         
     }
 }
