@@ -98,6 +98,81 @@ namespace Library
         
             return foundBook;
         }
+
+        
+        public void PrintBooksList<T>(List<T> bookList) where T : Book
+        {
+            if (bookList == null || bookList.Count == 0)
+            {
+                Console.WriteLine("Список книг пуст.");
+                return;
+            }
+
+            string separator = "-------------------------";
+            Console.WriteLine(separator);
+            Console.WriteLine("Список книг:");
+
+            foreach (var book in bookList)
+            {
+                Console.WriteLine(separator);
+                book.PrintShortInfo();
+            }
+
+            Console.WriteLine(separator);
+        }
+
+        public List<BookPreview> ReadShortYaml(string filePath)
+        {
+            try
+            {
+                if (!File.Exists(filePath))
+                    throw new FileNotFoundException($"Файл не найден: {filePath}");
+
+                var yaml = File.ReadAllText(filePath);
+                var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+
+                var rawBooks = deserializer.Deserialize<List<Dictionary<string, object>>>(yaml);
+
+                List<BookPreview> bookList = new List<BookPreview>();
+                foreach (var item in rawBooks)
+                {
+                    string ISBN = item["isbn"].ToString();
+                    string Title = item["title"].ToString();
+                    string Author = item["author"].ToString();
+                    string Genre = item["genre"].ToString();
+                    double CollateralValue = Convert.ToDouble(item["collateralValue"]);
+                    double RentalCost = Convert.ToDouble(item["rentalCost"]);
+                    BookPreview bookPreview = new BookPreview(ISBN, Title, Author, Genre, CollateralValue, RentalCost);
+                    bookList.Add(bookPreview);
+                    Console.WriteLine($"Книга (превью) '{bookPreview.Title}' успешно загружена из файла!");
+                }
+                return bookList;
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException("Ошибка чтения файла: " + ex.Message);
+            }
+        }
+
+        public void Get_K_N_ShortList(List<BookPreview> k, int n)
+        {
+            const int pageSize = 2; // Количество объектов на одной "странице"
+
+            if (k == null || k.Count == 0)
+                throw new ArgumentException("Список книг пуст или не инициализирован!");
+
+            if (n <= 0)
+                throw new ArgumentException("Номер страницы должен быть положительным числом!");
+
+            // Вычисляем, сколько элементов нужно пропустить, чтобы начать с нужной "страницы"
+            int skipCount = (n - 1) * pageSize;
+
+            if (skipCount >= k.Count)
+                throw new ArgumentException("Номер страницы выходит за пределы списка книг!");
+
+            List<BookPreview> result = k.Skip(skipCount).Take(pageSize).ToList();
+            PrintBooksList(result);
+        }
         
     }
 }
