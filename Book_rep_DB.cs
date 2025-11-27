@@ -70,5 +70,49 @@ namespace Library
             return result;
         }
         
+        private bool IsISBNUnique(string isbn, int? excludeBookId = null)
+        {
+            using var conn = new NpgsqlConnection(connectionString);
+            conn.Open();
+
+            string sql = "SELECT COUNT(*) FROM books WHERE isbn = @isbn";
+
+            // Если проверка при обновлении, то исключаем текущую книгу по ID
+            if (excludeBookId.HasValue)
+                sql += " AND book_id != @id";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("isbn", isbn);
+
+            if (excludeBookId.HasValue)
+                cmd.Parameters.AddWithValue("id", excludeBookId.Value);
+
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+            return count == 0;
+        }
+
+        public void AddBook(Book book)
+        {
+            if (!IsISBNUnique(book.ISBN))
+                throw new ArgumentException($"Книга с ISBN '{book.ISBN}' уже существует в базе данных!");
+
+            using var conn = new NpgsqlConnection(connectionString);
+            conn.Open();
+
+            string sql = @"
+            INSERT INTO books(isbn, title, author, genre)
+            VALUES(@isbn, @title, @author, @genre)
+            RETURNING book_id";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("isbn", book.ISBN.Trim());
+            cmd.Parameters.AddWithValue("title", book.Title);
+            cmd.Parameters.AddWithValue("author", book.Author);
+            cmd.Parameters.AddWithValue("genre", book.Genre);
+
+            int newId = (int)cmd.ExecuteScalar();
+            Console.WriteLine($"В базу данных добавлена новая книга с ID = {newId}");
+        }
+        
     }
 }
