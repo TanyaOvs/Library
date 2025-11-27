@@ -35,6 +35,40 @@ namespace Library
                 reader.GetString(4)
             );
         }
+        
+        public List<BookPreview> Get_K_N_ShortList(int pageNumber, int pageSize)
+        {
+            List<BookPreview> result = new List<BookPreview>();
+            int offset = (pageNumber - 1) * pageSize;
 
+            using var conn = new NpgsqlConnection(connectionString);
+            conn.Open();
+
+            string sql = @"
+            SELECT isbn, title, author, genre, collateral_value, rental_cost
+            FROM books
+            ORDER BY book_id
+            LIMIT @pageSize OFFSET @offset";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("pageSize", pageSize);
+            cmd.Parameters.AddWithValue("offset", offset);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                string isbn = reader.GetString(0);
+                string title = reader.GetString(1);
+                string author = reader.GetString(2);
+                string genre = reader.GetString(3);
+                double collateral = reader.GetDouble(4);
+                double rental = reader.GetDouble(5);
+
+                BookPreview bp = new BookPreview(isbn, title, author, genre, collateral, rental);
+                result.Add(bp);
+            }
+            return result;
+        }
+        
     }
 }
