@@ -1,26 +1,20 @@
 using System;
-using System.Collections.Generic;
 using Npgsql;
+using System.Collections.Generic;
+
 
 namespace Library
 {
     public class Book_rep_DB
     {
-        private readonly string connectionString;
-
-        public Book_rep_DB(string connectionString)
-        {
-            this.connectionString = connectionString;
-        }
+        private readonly Book_rep_db_connection db = Book_rep_db_connection.Instance;
+        public Book_rep_DB() { }
 
         public Book GetBookByID(int id)
         {
-            using var conn = new NpgsqlConnection(connectionString);
-            conn.Open();
-
             string sql = "SELECT book_id, isbn, title, author, genre FROM books WHERE book_id = @id";
 
-            using var cmd = new NpgsqlCommand(sql, conn);
+            using var cmd = new NpgsqlCommand(sql, db.Connection);
             cmd.Parameters.AddWithValue("id", id);
 
             using var reader = cmd.ExecuteReader();
@@ -35,14 +29,10 @@ namespace Library
                 reader.GetString(4)
             );
         }
-        
         public List<BookPreview> Get_K_N_ShortList(int pageNumber, int pageSize)
         {
             List<BookPreview> result = new List<BookPreview>();
             int offset = (pageNumber - 1) * pageSize;
-
-            using var conn = new NpgsqlConnection(connectionString);
-            conn.Open();
 
             string sql = @"
             SELECT isbn, title, author, genre, collateral_value, rental_cost
@@ -50,7 +40,7 @@ namespace Library
             ORDER BY book_id
             LIMIT @pageSize OFFSET @offset";
 
-            using var cmd = new NpgsqlCommand(sql, conn);
+            using var cmd = new NpgsqlCommand(sql, db.Connection);
             cmd.Parameters.AddWithValue("pageSize", pageSize);
             cmd.Parameters.AddWithValue("offset", offset);
 
@@ -69,19 +59,16 @@ namespace Library
             }
             return result;
         }
-        
+
         private bool IsISBNUnique(string isbn, int? excludeBookId = null)
         {
-            using var conn = new NpgsqlConnection(connectionString);
-            conn.Open();
-
             string sql = "SELECT COUNT(*) FROM books WHERE isbn = @isbn";
 
             // Если проверка при обновлении, то исключаем текущую книгу по ID
             if (excludeBookId.HasValue)
                 sql += " AND book_id != @id";
 
-            using var cmd = new NpgsqlCommand(sql, conn);
+            using var cmd = new NpgsqlCommand(sql, db.Connection);
             cmd.Parameters.AddWithValue("isbn", isbn);
 
             if (excludeBookId.HasValue)
@@ -96,15 +83,12 @@ namespace Library
             if (!IsISBNUnique(book.ISBN))
                 throw new ArgumentException($"Книга с ISBN '{book.ISBN}' уже существует в базе данных!");
 
-            using var conn = new NpgsqlConnection(connectionString);
-            conn.Open();
-
             string sql = @"
             INSERT INTO books(isbn, title, author, genre)
             VALUES(@isbn, @title, @author, @genre)
             RETURNING book_id";
 
-            using var cmd = new NpgsqlCommand(sql, conn);
+            using var cmd = new NpgsqlCommand(sql, db.Connection);
             cmd.Parameters.AddWithValue("isbn", book.ISBN.Trim());
             cmd.Parameters.AddWithValue("title", book.Title);
             cmd.Parameters.AddWithValue("author", book.Author);
@@ -113,24 +97,21 @@ namespace Library
             int newId = (int)cmd.ExecuteScalar();
             Console.WriteLine($"В базу данных добавлена новая книга с ID = {newId}");
         }
-        
+
         public void UpdateBook(int id, Book book)
         {
             if (!IsISBNUnique(book.ISBN, id))
                 throw new ArgumentException($"Книга с ISBN '{book.ISBN}' уже существует в базе данных!");
 
-            using var conn = new NpgsqlConnection(connectionString);
-            conn.Open();
-
             string sql = @"
-                UPDATE books
-                SET isbn = @isbn,
-                    title = @title,
-                    author = @author,
-                    genre = @genre
-                WHERE book_id = @id";
+            UPDATE books
+            SET isbn = @isbn,
+                title = @title,
+                author = @author,
+                genre = @genre
+            WHERE book_id = @id";
 
-            using var cmd = new NpgsqlCommand(sql, conn);
+            using var cmd = new NpgsqlCommand(sql, db.Connection);
 
             cmd.Parameters.AddWithValue("isbn", book.ISBN);
             cmd.Parameters.AddWithValue("title", book.Title);
@@ -142,15 +123,12 @@ namespace Library
                 throw new Exception("Книга для обновления не найдена!");
             Console.WriteLine("База данных успешно обновлена!");
         }
-        
+
         public void DeleteBook(int id)
         {
-            using var conn = new NpgsqlConnection(connectionString);
-            conn.Open();
-
             string sql = "DELETE FROM books WHERE book_id = @id";
 
-            using var cmd = new NpgsqlCommand(sql, conn);
+            using var cmd = new NpgsqlCommand(sql, db.Connection);
             cmd.Parameters.AddWithValue("id", id);
 
             if (cmd.ExecuteNonQuery() == 0)
@@ -158,16 +136,11 @@ namespace Library
 
             Console.WriteLine($"Книга с id {id} удалена из базы данных!");
         }
-        
+
         public int Get_Count()
         {
-            using var conn = new NpgsqlConnection(connectionString);
-            conn.Open();
-
             string sql = "SELECT COUNT(*) FROM books";
-
-            using var cmd = new NpgsqlCommand(sql, conn);
-
+            using var cmd = new NpgsqlCommand(sql, db.Connection);
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
     }
