@@ -51,7 +51,16 @@ namespace Library
             Author = author;
             Genre = genre;
         }
-
+        
+        public Book(int bookID, string isbn, string title, string author, string genre)
+        {
+            BookID = bookID;
+            ISBN = isbn;
+            Title = title;
+            Author = author;
+            Genre = genre;
+        }
+        
         public Book(string dataString)
         {
             var data_parts = (dataString.Trim()).Split(';');
@@ -153,3 +162,4 @@ namespace Library
         }
     }
 }
+
