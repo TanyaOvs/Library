@@ -114,5 +114,34 @@ namespace Library
             Console.WriteLine($"В базу данных добавлена новая книга с ID = {newId}");
         }
         
+        public void UpdateBook(int id, Book book)
+        {
+            if (!IsISBNUnique(book.ISBN, id))
+                throw new ArgumentException($"Книга с ISBN '{book.ISBN}' уже существует в базе данных!");
+
+            using var conn = new NpgsqlConnection(connectionString);
+            conn.Open();
+
+            string sql = @"
+                UPDATE books
+                SET isbn = @isbn,
+                    title = @title,
+                    author = @author,
+                    genre = @genre
+                WHERE book_id = @id";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+
+            cmd.Parameters.AddWithValue("isbn", book.ISBN);
+            cmd.Parameters.AddWithValue("title", book.Title);
+            cmd.Parameters.AddWithValue("author", book.Author);
+            cmd.Parameters.AddWithValue("genre", book.Genre);
+            cmd.Parameters.AddWithValue("id", id);
+
+            if (cmd.ExecuteNonQuery() == 0)
+                throw new Exception("Книга для обновления не найдена!");
+            Console.WriteLine("База данных успешно обновлена!");
+        }
+        
     }
 }
