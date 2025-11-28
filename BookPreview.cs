@@ -22,6 +22,13 @@ namespace Library
             RentalCost = rentalCost;
         }
 
+        
+        public BookPreview(int bookID, string isbn, string title, string author, string genre, double collateralValue, double rentalCost) : base(bookID, isbn, title, author, genre)
+        {
+            CollateralValue = collateralValue;
+            RentalCost = rentalCost;
+        }
+
         private static void ValidatePrice(double price, string fieldName)
         {
             const double MaxPriceValue = 10000;
