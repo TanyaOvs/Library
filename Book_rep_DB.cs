@@ -143,5 +143,21 @@ namespace Library
             Console.WriteLine("База данных успешно обновлена!");
         }
         
+        public void DeleteBook(int id)
+        {
+            using var conn = new NpgsqlConnection(connectionString);
+            conn.Open();
+
+            string sql = "DELETE FROM books WHERE book_id = @id";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("id", id);
+
+            if (cmd.ExecuteNonQuery() == 0)
+                throw new Exception("Книга для удаления не найдена!");
+
+            Console.WriteLine($"Книга с id {id} удалена из базы данных!");
+        }
+        
     }
 }
