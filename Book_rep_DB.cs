@@ -159,5 +159,16 @@ namespace Library
             Console.WriteLine($"Книга с id {id} удалена из базы данных!");
         }
         
+        public int Get_Count()
+        {
+            using var conn = new NpgsqlConnection(connectionString);
+            conn.Open();
+
+            string sql = "SELECT COUNT(*) FROM books";
+
+            using var cmd = new NpgsqlCommand(sql, conn);
+
+            return Convert.ToInt32(cmd.ExecuteScalar());
+        }
     }
 }
