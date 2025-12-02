@@ -6,8 +6,8 @@ namespace Library
 {
     public class Book_rep
     {
-        internal List<Book> bookList;
-        internal List<BookPreview> bookPreviewList;
+        protected List<Book> bookList;
+        protected List<BookPreview> bookPreviewList;
 
         public List<Book> BookList 
         {
