@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text.Json;
 
 
@@ -10,7 +9,7 @@ namespace Library
     {
         public Book_rep_json() { }
 
-        public List<Book> ReadJson(string filePath)
+        public void ReadJson(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("Путь к файлу не может быть пустым.");
@@ -20,8 +19,6 @@ namespace Library
 
             try
             {
-                List<Book> bookList = new List<Book>();
-
                 string jsonString = File.ReadAllText(filePath);
                 using JsonDocument doc = JsonDocument.Parse(jsonString);
                 JsonElement root = doc.RootElement;
@@ -39,7 +36,6 @@ namespace Library
                 }
 
                 Console.WriteLine($"\nВсего книг загружено: {bookList.Count}\n");
-                return bookList;
             }
             catch (JsonException ex)
             {
@@ -51,7 +47,7 @@ namespace Library
             }
         }
 
-        public List<BookPreview> ReadShortJson(string filePath)
+        public void ReadShortJson(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("Путь к файлу не может быть пустым.");
@@ -61,8 +57,6 @@ namespace Library
 
             try
             {
-                List<BookPreview> bookList = new List<BookPreview>();
-
                 string jsonString = File.ReadAllText(filePath);
                 using JsonDocument doc = JsonDocument.Parse(jsonString);
                 JsonElement root = doc.RootElement;
@@ -77,12 +71,11 @@ namespace Library
                     double RentalCost = bookElement.GetProperty("rentalCost").GetDouble();
 
                     BookPreview bookPreview = new BookPreview(ISBN, Title, Author, Genre, CollateralValue, RentalCost);
-                    bookList.Add(bookPreview);
+                    bookPreviewList.Add(bookPreview);
                     Console.WriteLine($"Книга '{bookPreview.Title}' успешно загружена из файла!");
                 }
 
                 Console.WriteLine($"Всего книг загружено: {bookList.Count}");
-                return bookList;
             }
             catch (JsonException ex)
             {
@@ -93,7 +86,7 @@ namespace Library
                 throw new ArgumentException("Ошибка чтения файла: " + ex.Message);
             }
         }
-        public void WriteJson(List<Book> bookList)
+        public void WriteJson()
         {
             if (bookList == null || bookList.Count == 0)
                 throw new ArgumentException("Список книг пуст или не инициализирован, нельзя записать данные в файл!");
