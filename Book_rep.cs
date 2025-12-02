@@ -6,8 +6,26 @@ namespace Library
 {
     public class Book_rep
     {
-        public Book_rep() { }
-        public Book GetBookByID(List<Book> bookList, int bookID)
+        internal List<Book> bookList;
+        internal List<BookPreview> bookPreviewList;
+
+        public List<Book> BookList 
+        {
+            get {return bookList; }
+        }
+
+        public List<BookPreview> BookPreviewList
+        {
+            get { return bookPreviewList; }
+        }
+
+        public Book_rep() 
+        {
+            bookList = new List<Book>();
+            bookPreviewList = new List<BookPreview>();
+        }
+
+        public virtual Book GetBookByID(int bookID)
         {
             if (bookList == null || bookList.Count == 0)
                 throw new ArgumentException("Список книг пуст или не инициализирован.");
@@ -41,11 +59,11 @@ namespace Library
             Console.WriteLine(separator);
         }
 
-        public void Get_K_N_ShortList(List<BookPreview> k, int n)
+        public virtual void Get_K_N_ShortList(int n)
         {
-            const int pageSize = 2; // Количество объектов на одной "странице"
+            const int pageSize = 5; // Количество объектов на одной "странице"
 
-            if (k == null || k.Count == 0)
+            if (bookPreviewList == null || bookPreviewList.Count == 0)
                 throw new ArgumentException("Список книг пуст или не инициализирован!");
 
             if (n <= 0)
@@ -54,10 +72,10 @@ namespace Library
             // Вычисляем, сколько элементов нужно пропустить, чтобы начать с нужной "страницы"
             int skipCount = (n - 1) * pageSize;
 
-            if (skipCount >= k.Count)
+            if (skipCount >= bookPreviewList.Count)
                 throw new ArgumentException("Номер страницы выходит за пределы списка книг!");
 
-            List<BookPreview> result = k.Skip(skipCount).Take(pageSize).ToList();
+            List<BookPreview> result = bookPreviewList.Skip(skipCount).Take(pageSize).ToList();
             PrintBooksList(result);
         }
 
@@ -71,7 +89,7 @@ namespace Library
             return !string.IsNullOrEmpty(str);
         }
 
-        public void SortBooksByTitle(List<Book> bookList)
+        public void SortBooksByTitle()
         {
             if (bookList == null || bookList.Count == 0)
             {
@@ -117,7 +135,7 @@ namespace Library
             PrintBooksList(bookList);
         }
 
-        public List<Book> AddBookInList(List<Book> bookList, Book book)
+        public virtual void AddBookInList(Book book)
         {
             foreach (Book bookElem in bookList)
             {
@@ -127,33 +145,50 @@ namespace Library
                 }
             }
             bookList.Add(book);
-            return bookList;
+            Console.WriteLine($"Книга '{book.Title}' добавлена в список!");
         }
 
-        public List<Book> ChangeBookByID(List<Book> bookList, Book book, int bookID)
+        public virtual void ChangeBookByID(Book book, int bookID)
         {
-            // if (bookID < 0 || bookID >= bookList.Count)
-            if (bookID < 0)
+            if (bookID < 0 || bookID > bookList.Max(b => b.BookID))
                 throw new ArgumentException("ID выходит за пределы списка bookList!");
+
+            foreach (Book bookElem in bookList)
+            {
+                if (Book.CompareBooks(book, bookElem))
+                {
+                    throw new ArgumentException($"Нельзя добавить книгу {book.Title}: книга с таким же ISBN уже находится в списке!");
+                }
+            }
 
             foreach (Book bookElem in bookList)
             {
                 if (bookElem.BookID == bookID)
                 {
                     bookList[bookList.IndexOf(bookElem)] = book;
+                    Console.WriteLine($"Книга '{bookElem.Title}' изменилась на '{book.Title}'.");
                     break;
                 }
             }
-            return bookList;
         }
 
-        public List<Book> DeleteBookInList(List<Book> bookList, Book book)
+        public virtual void DeleteBookInList(int bookID)
         {
-            bookList.Remove(book);
-            return bookList;
+            if (bookID < 0 || bookID > bookList.Max(b => b.BookID))
+                throw new ArgumentException("ID выходит за пределы списка bookList!");
+
+            foreach (Book bookElem in bookList)
+            {
+                if (bookElem.BookID == bookID)
+                {
+                    bookList.Remove(bookElem);
+                    Console.WriteLine($"Книга '{bookElem.Title}' удалена из списка!");
+                    break;
+                }
+            }
         }
 
-        public int Get_Count(List<Book> bookList)
+        public virtual int Get_Count()
         {
             return bookList.Count;
         }
