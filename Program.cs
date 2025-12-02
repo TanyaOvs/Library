@@ -1,57 +1,48 @@
 using System;
-using System.IO;
-
 
 namespace Library
 {
     class Program
     {
         static void Main(string[] args)
-        { 
-            // Работа с YAML
+        {
+            // Работа с базой данных через адаптер
             try
             {
-                // Чтение объектов класса Book в List на основе yaml 
-                string fullPath = Path.Combine(Directory.GetCurrentDirectory(), "books.yaml");
+                // 1. Объект для работы с БД
+                Book_rep_DB brdb = new Book_rep_DB();
+                Book_rep brdb_adapter = new Book_rep_db_adapter(brdb);
 
-                // 1. Объект для работы с yaml
-                Book_rep_yaml bry = new Book_rep_yaml();
+                // a. Получить объект по ID
+                Book testBook = brdb_adapter.GetBookByID(5);
+                Console.WriteLine("Информация о найденной книге:");
+                testBook.PrintFullInfo();
 
-                // a. Чтение всех значений из yaml (создание списка книг)
-                bry.ReadYaml(fullPath);
+                // b. Получить список k по счету n объектов класса short 
+                brdb_adapter.Get_K_N_ShortList(2);
 
-                // b. Запись данных в файл
-                bry.WriteYaml();
+                // c. Добавить объект в список
+                Book superBook = new Book("979-5-95947-389-0", "Илиада", "Гомер", "Эпос");
+                //brdb_adapter.AddBookInList(superBook);
 
-                // c. Получение объекта по ID
-                Book foundBook = bry.GetBookByID(5);
-                Console.WriteLine($"Найденная книга: {foundBook.Title}");
+                // d. Заменить элемент списка по ID
+                Book superDuperBook = new Book("979-5-12093-301-9", "Записки Доктора Ватсона", "Артур Конан Дойл", "Детектив");
+                //brdb_adapter.ChangeBookByID(superDuperBook, 16);
 
-                // d. Получить список k по счету n объектов класса short
-                bry.ReadShortYaml(fullPath);
-                bry.Get_K_N_ShortList(2);
+                // e. Удалить элемент списка по ID
+                //brdb_adapter.DeleteBookInList(16);
 
-                // e. Сортировать элементы по выбранному полю (title)
-                bry.SortBooksByTitle();
+                // f. Получить количество элементов
+                Console.WriteLine($"Количество книг в базе данных: {brdb_adapter.Get_Count()}");
 
-                // f. Добавить объект в список
-                Book firstBook = new Book("979-5-54360-678-0", "Одиссея", "Гомер", "Эпос");
-                bry.AddBookInList(firstBook);
-                bry.PrintBooksList(bry.BookList);
-
-                // g. Заменить элемент списка по ID
-                Book secondBook = new Book("979-5-12363-123-0", "Илиада", "Гомер", "Эпос");
-                bry.ChangeBookByID(secondBook, 2);
-
-                // h. Удалить элемент списка по ID
-                bry.DeleteBookInList(9);
-
-                // i. Получить количество элементов
-                Console.WriteLine($"Количество элементов в списке bookList: {bry.Get_Count()}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Ошибка: {ex.Message}");
+            }
+            finally
+            {
+                Book_rep_db_connection.Instance.Close();
             }
         }
     }
