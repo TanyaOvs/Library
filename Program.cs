@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
 
 
 namespace Library
@@ -8,53 +8,53 @@ namespace Library
     {
         static void Main(string[] args)
         {
-            // Работа с базой данных
+            // Работа с JSON
             try
             {
-                // 1. Объект для работы с БД
-                Book_rep_DB brdb = new Book_rep_DB();
+                // Чтение объектов класса Book в List на основе JSON файла
+                string fullPath = Path.Combine(Directory.GetCurrentDirectory(), "books.json");
 
-                // a. Получить объект по ID
-                Book testBook = brdb.GetBookByID(5);
-                testBook.PrintFullInfo();
+                // 1. Объект для работы с JSON
+                Book_rep_json brj = new Book_rep_json();
 
-                // b. Получить список k по счету n объектов класса short 
-                List<BookPreview> bpList = brdb.Get_K_N_ShortList(4, 2);
+                // a. Создание списка на основе JSON
+                brj.ReadJson(fullPath);
 
-                string beautifulSeparator = "-------------";
-                Console.WriteLine(beautifulSeparator);
-                Console.WriteLine("Список книг: ");
+                // b. Запись данных в файл
+                brj.WriteJson();
 
-                foreach (BookPreview bp in bpList)
-                {
-                    Console.WriteLine(beautifulSeparator);
-                    bp.PrintShortInfo();
-                }
-                Console.WriteLine(beautifulSeparator);
+                // c. Получение объекта по ID
+                Book foundBook = brj.GetBookByID(2);
+                Console.WriteLine($"Найденная книга: {foundBook.Title}");
 
-                // c. Добавить объект в список
-                Book superBook = new Book("979-5-95947-180-0", "Илиада", "Гомер", "Эпос");
-                //brdb.AddBook(superBook);
+                // d. Получить список k по счету n объектов класса short
+                brj.ReadShortJson(fullPath);
+                brj.Get_K_N_ShortList(5);
 
-                // d. Заменить элемент списка по ID
-                Book superDuperBook = new Book("979-5-12993-321-9", "Записки Доктора Ватсона", "Артур Конан Дойл", "Детектив");
-                //brdb.UpdateBook(15, superDuperBook);
+                // e. Сортировать элементы по выбранному полю (title)
+                brj.SortBooksByTitle();
 
-                // e. Удалить элемент списка по ID
-                brdb.DeleteBook(15);
+                // f. Добавить объект в список
+                Book firstBook = new Book("979-5-54360-678-0", "Одиссея", "Гомер", "Эпос");
+                brj.AddBookInList(firstBook);
+                brj.PrintBooksList(brj.BookList);
 
-                // f. Получить количество элементов
-                Console.WriteLine($"Количество книг в базе данных: {brdb.Get_Count()}");
+                // g. Заменить элемент списка по ID
+                Book secondBook = new Book("979-5-12363-123-0", "Илиада", "Гомер", "Эпос");
+                brj.ChangeBookByID(secondBook, 2);
+
+                // h. Удалить элемент списка по ID
+                brj.DeleteBookInList(3);
+
+                // i. Получить количество элементов
+                Console.WriteLine($"Количество элементов в списке bookList: {brj.Get_Count()}");
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Ошибка: {ex.Message}");
             }
-            finally
-            {
-                Book_rep_db_connection.Instance.Close();
-            }
+
         }
     }
 }
