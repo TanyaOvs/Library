@@ -29,8 +29,9 @@ namespace Library
                 reader.GetString(4)
             );
         }
-        public List<BookPreview> Get_K_N_ShortList(int pageNumber, int pageSize)
+        public List<BookPreview> Get_K_N_ShortList(int pageNumber)
         {
+            int pageSize = 2; // Количество объектов на одной "странице"
             List<BookPreview> result = new List<BookPreview>();
             int offset = (pageNumber - 1) * pageSize;
 
@@ -98,7 +99,7 @@ namespace Library
             Console.WriteLine($"В базу данных добавлена новая книга с ID = {newId}");
         }
 
-        public void UpdateBook(int id, Book book)
+        public void UpdateBook(Book book, int id)
         {
             if (!IsISBNUnique(book.ISBN, id))
                 throw new ArgumentException($"Книга с ISBN '{book.ISBN}' уже существует в базе данных!");
