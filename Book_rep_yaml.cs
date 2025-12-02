@@ -9,7 +9,7 @@ namespace Library
     public class Book_rep_yaml : Book_rep
     {
         public Book_rep_yaml() { }
-        public List<Book> ReadYaml(string filePath)
+        public void ReadYaml(string filePath)
         {
             try
             {
@@ -20,8 +20,6 @@ namespace Library
                 var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
 
                 var rawBooks = deserializer.Deserialize<List<Dictionary<string, object>>>(yaml);
-
-                List<Book> bookList = new List<Book>();
                 foreach (var item in rawBooks)
                 {
                     string ISBN = item["isbn"].ToString();
@@ -32,7 +30,6 @@ namespace Library
                     bookList.Add(book);
                     Console.WriteLine($"Книга '{book.Title}' успешно загружена из файла!");
                 }
-                return bookList;
             }
             catch (Exception ex)
             {
@@ -40,7 +37,7 @@ namespace Library
             }
         }
 
-        public List<BookPreview> ReadShortYaml(string filePath)
+        public void ReadShortYaml(string filePath)
         {
             try
             {
@@ -52,7 +49,6 @@ namespace Library
 
                 var rawBooks = deserializer.Deserialize<List<Dictionary<string, object>>>(yaml);
 
-                List<BookPreview> bookList = new List<BookPreview>();
                 foreach (var item in rawBooks)
                 {
                     string ISBN = item["isbn"].ToString();
@@ -62,10 +58,9 @@ namespace Library
                     double CollateralValue = Convert.ToDouble(item["collateralValue"]);
                     double RentalCost = Convert.ToDouble(item["rentalCost"]);
                     BookPreview bookPreview = new BookPreview(ISBN, Title, Author, Genre, CollateralValue, RentalCost);
-                    bookList.Add(bookPreview);
+                    bookPreviewList.Add(bookPreview);
                     Console.WriteLine($"Книга (превью) '{bookPreview.Title}' успешно загружена из файла!");
                 }
-                return bookList;
             }
             catch (Exception ex)
             {
@@ -73,7 +68,7 @@ namespace Library
             }
         }
 
-        public void WriteYaml(List<Book> bookList)
+        public void WriteYaml()
         {
             if (bookList == null || bookList.Count == 0)
                 throw new ArgumentException("Список книг пуст или не инициализирован, нельзя записать данные в файл!");
