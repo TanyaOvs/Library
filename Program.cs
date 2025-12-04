@@ -1,39 +1,48 @@
 using System;
+using System.Collections.Generic;
 
 namespace Library
 {
     class Program
     {
+        private static void PrintBooksList<T>(List<T> bookList) where T : Book
+        {
+            if (bookList == null || bookList.Count == 0)
+            {
+                Console.WriteLine("Список книг пуст.");
+                return;
+            }
+
+            string separator = "-------------------------";
+            Console.WriteLine(separator);
+            Console.WriteLine("Список книг:");
+
+            foreach (var book in bookList)
+            {
+                Console.WriteLine(separator);
+                book.PrintFullInfo();
+            }
+
+            Console.WriteLine(separator);
+        }
+
         static void Main(string[] args)
         {
-            // Работа с базой данных через адаптер
+            // Работа с базой данных через декоратор
             try
             {
-                // 1. Объект для работы с БД
                 Book_rep_DB brdb = new Book_rep_DB();
-                Book_rep brdb_adapter = new Book_rep_db_adapter(brdb);
+                IBookRepository repo = new Book_rep_adapter(brdb);
 
-                // a. Получить объект по ID
-                Book testBook = brdb_adapter.GetBookByID(5);
-                Console.WriteLine("Информация о найденной книге:");
-                testBook.PrintFullInfo();
+                // Пример использования фильтра
+                repo = new FilterDecorator(repo, bp => bp.Genre == "Роман");
 
-                // b. Получить список k по счету n объектов класса short 
-                brdb_adapter.Get_K_N_ShortList(2);
+                // Пример использовния сортировки
+                repo = new SortDecorator(repo, bp => bp.Author);
 
-                // c. Добавить объект в список
-                Book superBook = new Book("979-5-95947-389-0", "Илиада", "Гомер", "Эпос");
-                //brdb_adapter.AddBookInList(superBook);
-
-                // d. Заменить элемент списка по ID
-                Book superDuperBook = new Book("979-5-12093-301-9", "Записки Доктора Ватсона", "Артур Конан Дойл", "Детектив");
-                //brdb_adapter.ChangeBookByID(superDuperBook, 16);
-
-                // e. Удалить элемент списка по ID
-                //brdb_adapter.DeleteBookInList(16);
-
-                // f. Получить количество элементов
-                Console.WriteLine($"Количество книг в базе данных: {brdb_adapter.Get_Count()}");
+                // Отображение результатов
+                List<BookPreview> page = repo.Get_K_N_ShortList(1);
+                PrintBooksList(page);
 
             }
             catch (Exception ex)
