@@ -59,7 +59,7 @@ namespace Library
             Console.WriteLine(separator);
         }
 
-        public virtual void Get_K_N_ShortList(int n)
+        public virtual List<BookPreview> Get_K_N_ShortList(int n)
         {
             const int pageSize = 5; // Количество объектов на одной "странице"
 
@@ -77,6 +77,7 @@ namespace Library
 
             List<BookPreview> result = bookPreviewList.Skip(skipCount).Take(pageSize).ToList();
             PrintBooksList(result);
+            return result;
         }
 
         private bool IsDigitsOnly(string str)
