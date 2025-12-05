@@ -28,30 +28,49 @@ namespace Library
 
         static void Main(string[] args)
         {
-            // Работа с базой данных через декоратор
+            // Работа с файлами через декоратор
             try
             {
-                Book_rep_DB brdb = new Book_rep_DB();
-                IBookRepository repo = new Book_rep_adapter(brdb);
+                // Пример для JSON
+                Book_rep_json brj = new Book_rep_json();
+                brj.ReadShortFile("books.json");
+
+                IBookRepository fileRepo = new Book_rep_file_adapter(brj);
 
                 // Пример использования фильтра
-                repo = new FilterDecorator(repo, bp => bp.Genre == "Роман");
+                fileRepo = new FilterDecorator(fileRepo, b => b.Genre == "Детектив");
 
-                // Пример использовния сортировки
-                repo = new SortDecorator(repo, bp => bp.Author);
+                // Пример использования сортировки
+                fileRepo = new SortDecorator(fileRepo, b => b.Author);
 
-                // Отображение результатов
-                List<BookPreview> page = repo.Get_K_N_ShortList(1);
+                List<BookPreview> page = fileRepo.Get_K_N_ShortList(2);
                 PrintBooksList(page);
 
+                int count = fileRepo.Get_Count();
+                Console.WriteLine($"Количество отфильтрованных книг: {count}");
+
+
+                // Пример для YAML
+                Book_rep_yaml bry = new Book_rep_yaml();
+                bry.ReadShortFile("books.json");
+
+                fileRepo = new Book_rep_file_adapter(bry);
+
+                // Пример использования фильтра
+                fileRepo = new FilterDecorator(fileRepo, b => b.Genre == "Роман");
+
+                // Пример использования сортировки
+                fileRepo = new SortDecorator(fileRepo, b => b.Author);
+
+                List<BookPreview> pageTest = fileRepo.Get_K_N_ShortList(1);
+                PrintBooksList(pageTest);
+
+                int countTest = fileRepo.Get_Count();
+                Console.WriteLine($"Количество отфильтрованных книг: {countTest}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Ошибка: {ex.Message}");
-            }
-            finally
-            {
-                Book_rep_db_connection.Instance.Close();
             }
         }
     }
