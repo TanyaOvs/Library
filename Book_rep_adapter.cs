@@ -17,9 +17,24 @@ namespace Library
             inner = db;
         }
 
-        public Book GetBookByID(int id)
+        public List<BookPreview> Get_K_N_ShortList(int n)
         {
-            return inner.GetBookByID(id);
+            return inner.Get_K_N_ShortList(n);
+        }
+
+        public int Get_Count()
+        {
+            return inner.Get_Count();
+        }
+    }
+
+    public class Book_rep_file_adapter : IBookRepository
+    {
+        private readonly Book_rep inner;
+
+        public Book_rep_file_adapter(Book_rep br)
+        {
+            inner = br;
         }
 
         public List<BookPreview> Get_K_N_ShortList(int n)
@@ -32,5 +47,4 @@ namespace Library
             return inner.Get_Count();
         }
     }
-
 }
